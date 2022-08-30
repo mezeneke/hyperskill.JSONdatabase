@@ -1,11 +1,12 @@
 package myutil;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 public class Response implements Message {
     private String response;
     private String reason;
-    private String value;
+    private JsonElement value;
 
     public Response setResponse(String response) {
         this.response = response;
@@ -17,7 +18,7 @@ public class Response implements Message {
         return this;
     }
 
-    public Response setValue(String value) {
+    public Response setValue(JsonElement value) {
         this.value = value;
         return this;
     }

@@ -1,6 +1,10 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import myutil.JsonRequest;
 import myutil.Request;
 import myutil.Response;
 
@@ -20,6 +24,7 @@ public class JsonDB {
     final String FILE_PATH = ".\\server\\data\\db.txt";
     final File file;
     private final Map<String, String> db;
+    private final JsonObject jsonDB;
     static final ReadWriteLock lock = new ReentrantReadWriteLock();
     static final Lock readLock = lock.readLock();
     static final Lock writeLock = lock.writeLock();
@@ -27,15 +32,16 @@ public class JsonDB {
 
     JsonDB() {
         this.db = new HashMap<>(SIZE);
+        this.jsonDB = new JsonObject();
         this.file = new File(FILE_PATH);
     }
 
-    public Response handleRequest(Request request) {
+    public Response handleRequest(JsonRequest request) {
 
         Response response = new Response();
         return response = switch (request.getType()) {
             case "get" -> {
-                String value = get(request.getKey());
+                JsonElement value = get(request.getKey());
                 if (value != null) {
                     response.setResponse(CODE_SUCCESS);
                     response.setValue(value);
@@ -66,28 +72,48 @@ public class JsonDB {
         };
     }
 
-    String get(String key) {
+    JsonElement get(JsonElement key) {
+        JsonElement value;
         readLock.lock();
-        String value;
         try {
-            value = db.get(key);
+            if (key.isJsonPrimitive()) {
+                value = jsonDB.get(key.getAsString());
+            } else if (key.isJsonArray()) {
+                value = jsonDB;
+                JsonArray array = key.getAsJsonArray();
+
+                for (int i = 0; i < array.size(); i++) {
+
+                    String keyStr = array.get(i).getAsString();
+
+                    if(value != null && value.isJsonObject()) {
+                        if (value.getAsJsonObject().has(keyStr)) {
+                            value = value.getAsJsonObject().get(keyStr);
+                        }
+                    } else {
+                        value = null;
+                    }
+                }
+            } else {
+                value = null;
+            }
         } finally {
             readLock.unlock();
         }
         return value;
     }
 
-    void set(String key, String value) {
+    void set(JsonElement key, JsonElement value) {
         writeLock.lock();
         try {
-            db.put(key, value);
+            jsonDB.add(key.getAsString(), value);
             storeDB();
         } finally {
             writeLock.unlock();
         }
     }
 
-    String delete(String key) {
+    String delete(JsonElement key) {
         writeLock.lock();
         String value;
         try {

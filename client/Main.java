@@ -2,25 +2,25 @@ package client;
 
 import com.google.gson.Gson;
 import myutil.Connection;
+import myutil.JsonRequest;
 import myutil.Request;
-import java.io.File;
-import java.io.FileNotFoundException;
 
+import java.io.*;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
         Gson gson = new Gson();
-        Request request = new Request();
+        JsonRequest request = new JsonRequest();
 
         if (args[0].equals("-in")) {
-            File file = new File(".\\data\\" + args[1]);
-
-            try (Scanner reader = new Scanner(file);) {
-                String jsonRequest = reader.nextLine();
-                request = gson.fromJson(jsonRequest, Request.class);
-            } catch (FileNotFoundException e) {
+            try (Reader reader = Files.newBufferedReader(Paths.get(".\\data\\" + args[1]))) {
+                request = gson.fromJson(reader, JsonRequest.class);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {

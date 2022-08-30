@@ -5,14 +5,14 @@ import com.beust.jcommander.Parameter;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
-public class Request implements Message {
+public class JsonRequest implements Message {
 
     @Parameter(names= "-t")
     private String type;
-    @Parameter(names= "-k")
-    private String key;
-    @Parameter(names= "-v")
-    private String value;
+    @Parameter(names= "-k", converter = JsonElementConverter.class)
+    private JsonElement key;
+    @Parameter(names= "-v", converter = JsonElementConverter.class)
+    private JsonElement value;
 
     public void parse(String[] args) {
         JCommander jBuilder = JCommander.newBuilder()
@@ -25,11 +25,11 @@ public class Request implements Message {
         return type;
     }
 
-    public String getKey() {
+    public JsonElement getKey() {
         return key;
     }
 
-    public String getValue() {
+    public JsonElement getValue() {
         return value;
     }
 

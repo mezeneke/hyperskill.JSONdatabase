@@ -15,13 +15,13 @@ public class Session implements Runnable {
 
     @Override
     public void run() {
-        Request request;
+        JsonRequest request;
         Response response;
 
         try (connection) {
 
             String json = connection.readMessage();
-            request = gson.fromJson(json, Request.class);
+            request = gson.fromJson(json, JsonRequest.class);
 
             if (request.getType().equals("exit")) {
                 connection.getServer().exit();
