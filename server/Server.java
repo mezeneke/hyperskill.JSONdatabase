@@ -42,7 +42,6 @@ public class Server {
             } catch (InterruptedException e2) {
                 e2.printStackTrace();
             }
-
             if (termination) {
                 System.out.println("Executor terminated");
             } else {
@@ -56,10 +55,8 @@ public class Server {
         running = false;
         try {
             serverSocket.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

@@ -1,7 +1,6 @@
 package myutil;
 
 import com.beust.jcommander.IStringConverter;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 public class JsonElementConverter implements IStringConverter<JsonPrimitive> {
